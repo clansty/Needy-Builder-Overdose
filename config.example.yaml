@@ -1,18 +1,22 @@
-hosts:
-
+builders:
+  aarch64:
+    type: ssh-docker
+    dockerCommand: docker
+    host: builder@172.16.0.81
+dockerImage: ghcr.io/clansty/package-builder:archlinux
 paths:
-  sources: 
+  sources:
     x86_64: /pkgbuilder-work/x86_64
     aarch64: /pkgbuilder-work/aarch64
     i686: /pkgbuilder-work/i686
     loong64: /pkgbuilder-work/loong64
     riscv64: /pkgbuilder-work/riscv64
   logs: /pkgbuilder-work/logs
-  program: /home/clansty.linux/Projects/Needy-Builder-Overdose
+  # program: /home/clansty.linux/Projects/Needy-Builder-Overdose
+  program: /pkgbuilder-work/program
 
 arches: [ x86_64 aarch64 i686 loong64 riscv64 ]
 pacman:
-
   - alist-bin
   - altserver-bin
   - apfs-fuse-git
@@ -44,8 +48,8 @@ pacman:
   - deepin-wine-plugin-virtual
   - deepin-wine-wechat
   - deepin-wine5
-  - deepin-wine6-stable
-  - deepin-wine6-stable
+  - p: deepin-wine6-stable
+    extraDeps: lib32-udis86-git
   - ddns-go-bin
   - discord_arch_electron
   - disman-kwinft

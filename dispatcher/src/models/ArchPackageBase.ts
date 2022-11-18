@@ -6,6 +6,7 @@ import fs from "fs";
 import log4js from "log4js";
 import date from "date-format";
 import docker from "../utils/docker";
+import { DockerRunConfig, SshConfig } from "../types/ConfigTypes";
 
 export default class ArchPackageBase {
   protected readonly log: log4js.Logger;
@@ -75,20 +76,26 @@ export default class ArchPackageBase {
       const log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`);
       log.mark("Start building");
       let builder: ChildProcessWithoutNullStreams;
-      switch (this.arch) {
-        case "aarch64": {
-          // nerdctl run --rm -v ./layan-cursor-theme-git:/work -v /Users/clansty/Projects/Needy-Builder-Overdose/builder/scripts:/scripts --platform linux/amd64 ghcr.io/clansty/package-builder:archlinux sudo -u builder /scripts/build.sh
-          builder = docker.run("ghcr.io/clansty/package-builder:archlinux", {
-            volumes: {
-              "/work": this.path,
-              "/scripts": `${config.paths.program}/builder/scripts`,
-            },
-            rm: true,
-            command: ["sudo", "-u", "builder", "/scripts/build.sh"],
-          });
+      const builderConfig = config.builders[this.arch];
+      const dockerConfig = {
+        volumes: {
+          "/work": this.path,
+          "/scripts": `${config.paths.program}/builder/scripts`,
+        },
+        rm: true,
+        command: ["sudo", "-u", "builder", "/scripts/build.sh"],
+        ...builderConfig,
+      };
+
+      switch (builderConfig.type) {
+        case "local": {
+          builder = docker.run(config.dockerImage, dockerConfig);
           break;
         }
-        // TODO
+        case "ssh-docker": {
+          builder = docker.runOverSsh(config.dockerImage, dockerConfig as DockerRunConfig & SshConfig);
+          break;
+        }
       }
       builder.stdout.on("data", (data) => {
         log.info(data.toString("utf8"));

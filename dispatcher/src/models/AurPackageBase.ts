@@ -1,5 +1,5 @@
 import { Arch } from "../types/enums";
-import PackageInit from "../types/PackageInit";
+import { PackageInit } from "../types/ConfigTypes";
 import ArchPackageBase from "./ArchPackageBase";
 import fs from "fs";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
