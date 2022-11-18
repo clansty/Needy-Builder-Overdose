@@ -5,10 +5,10 @@ yay -Syu --noconfirm --nouseask
 echo 'PACKAGER="Clansty <i@gao4.pw>"
 COMPRESSZST=(zstd -19 -c -z -q --threads=0 -)' > ~/.makepkg.conf
 
-sudo chown -R builder:builder /work
+sudo chown -R builder /work
 
 source PKGBUILD
-for pkg in ${makedepends[@]} ${depends[@]} ;do
+for pkg in ${EXTRA_DEPENDS[@]} ${makedepends[@]} ${depends[@]} ;do
   yay -S --noconfirm --nouseask --needed --asdeps --overwrite='*' $pkg
 done
 
