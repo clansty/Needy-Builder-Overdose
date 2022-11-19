@@ -1,8 +1,10 @@
-import ArchPackageBase from "./models/ArchPackageBase";
 import log4js from "log4js";
 import path from "path";
 import config from "./models/config";
-import AurPackageBase from "./models/AurPackageBase";
+import { ChildProcessWithoutNullStreams } from "child_process";
+import docker from "./utils/docker";
+import { ArchConfig } from "./types/ConfigTypes";
+import wrapChildProcess from "./utils/wrapChildProcess";
 
 log4js.configure({
   appenders: {
@@ -36,14 +38,29 @@ log4js.configure({
 
 const log = log4js.getLogger("Dispatcher");
 
-log.info("Dispatcher started");
-
 (async () => {
-  const pkg = new AurPackageBase("hyfetch", "aarch64");
-  log.info("Update Source...");
-  await pkg.updateSource();
-  log.info("build needed:", pkg.rebuildNeeded);
-  log.info("Build Package...");
-  await pkg.build();
-  log.info("build needed:", pkg.rebuildNeeded);
+  log.info("Dispatcher started");
+
+  for (const [arch, builder] of Object.entries(config.builders)) {
+    log.info("Update docker image for", arch, "builder...");
+    try {
+      const archCfg: ArchConfig = config.arches[arch];
+      let command: ChildProcessWithoutNullStreams;
+      switch (builder.type) {
+        case "local":
+          command = docker.pull({ ...archCfg, ...builder });
+          break;
+        case "ssh-docker":
+          command = docker.pullOverSsh({ ...archCfg, ...builder });
+          break;
+        default:
+          log.info("No need for type", builder.type);
+          break;
+      }
+      await wrapChildProcess(command, log4js.getLogger(`UpdateDocker.${arch}`));
+      log.info("Update docker image for", arch, "builder done");
+    } catch (error) {
+      log.error("Unable to update docker image for", arch, "builder");
+    }
+  }
 })();

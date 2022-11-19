@@ -1,7 +1,7 @@
 import YAML from "yaml";
 import fs from "fs";
 import { Arch } from "../types/enums";
-import { Builder, PackageInit } from "../types/ConfigTypes";
+import { ArchConfig, Builder, PackageInit } from "../types/ConfigTypes";
 
 const CONFIG_PATH = process.env.CONFIG;
 
@@ -13,5 +13,5 @@ export default YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
     program: string;
   };
   pacman: Array<PackageInit>;
-  dockerImage: string;
+  arches: { [key in Arch]: ArchConfig };
 };

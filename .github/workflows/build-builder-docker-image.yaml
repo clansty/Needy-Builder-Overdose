@@ -13,7 +13,7 @@ jobs:
         # TODO: parse from config
         include:
           - name: archlinux
-            from: ghcr.io/clansty/archlinuxarm:base-devel
+            from: ghcr.io/clansty/archlinux:base-devel
             package-type: pacman
           - name: manjaro
             from: manjarolinux/base:latest

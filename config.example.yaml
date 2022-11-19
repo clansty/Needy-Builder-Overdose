@@ -3,7 +3,10 @@ builders:
     type: ssh-docker
     dockerCommand: docker
     host: builder@172.16.0.81
-dockerImage: ghcr.io/clansty/package-builder:archlinux
+  x86_64:
+    type: ssh-docker
+    dockerCommand: docker
+    host: builder@172.16.0.86
 paths:
   sources:
     x86_64: /pkgbuilder-work/x86_64
@@ -15,7 +18,14 @@ paths:
   # program: /home/clansty.linux/Projects/Needy-Builder-Overdose
   program: /pkgbuilder-work/program
 
-arches: [ x86_64 aarch64 i686 loong64 riscv64 ]
+arches: 
+  x86_64:
+    dockerImage: ghcr.io/clansty/package-builder:archlinux
+    platform: linux/amd64
+  aarch64:
+    dockerImage: ghcr.io/clansty/package-builder:archlinux
+    platform: linux/arm64
+
 pacman:
   - alist-bin
   - altserver-bin
@@ -145,8 +155,6 @@ pacman:
   - python-types-pyyaml
   - python-types-requests
   - python-vsts-cd-manager
-  - qemu-loongarch64
-  - qemu-system-loongarch64-git
   - rdm-bin
   - realvnc-vnc-server
   - realvnc-vnc-viewer

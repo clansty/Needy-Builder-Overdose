@@ -3,6 +3,7 @@ import { PackageInit } from "../types/ConfigTypes";
 import ArchPackageBase from "./ArchPackageBase";
 import fs from "fs";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import wrapChildProcess from "../utils/wrapChildProcess";
 
 export default class AurPackageBase extends ArchPackageBase {
   public constructor(init: PackageInit, arch: Arch) {
@@ -15,30 +16,15 @@ export default class AurPackageBase extends ArchPackageBase {
   }
 
   public updateSource() {
-    return new Promise<void>((resolve, reject) => {
-      const dirExists = fs.existsSync(this.path);
-      let command: ChildProcessWithoutNullStreams;
-      if (dirExists) {
-        command = spawn("git", ["pull"], {
-          cwd: this.path,
-        });
-      } else {
-        command = spawn("git", ["clone", this.aurGitUrl, this.path]);
-      }
-      command.stdout.on("data", (data) => {
-        this.log.info(data.toString("utf8"));
+    const dirExists = fs.existsSync(this.path);
+    let command: ChildProcessWithoutNullStreams;
+    if (dirExists) {
+      command = spawn("git", ["pull"], {
+        cwd: this.path,
       });
-      command.stderr.on("data", (data) => {
-        this.log.error(data.toString("utf8"));
-      });
-      command.on("close", (code) => {
-        this.log.mark("Git exited:", code);
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(`Git returned ${code}`);
-        }
-      });
-    });
+    } else {
+      command = spawn("git", ["clone", this.aurGitUrl, this.path]);
+    }
+    return wrapChildProcess(command, this.log);
   }
 }

@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import { DockerRunConfig, SshConfig } from "../types/ConfigTypes";
 
 const docker = {
-  runArgs(image: string, params: DockerRunConfig) {
+  runArgs(params: DockerRunConfig) {
     const args = ["run"];
     params.rm && args.push("--rm");
     if (params.volumes) {
@@ -16,18 +16,35 @@ const docker = {
         args.push("-e", `${name}=${value}`);
       }
     }
-    args.push(image);
+    params.platform && args.push("--platform", params.platform);
+    args.push(params.dockerImage);
     params.command && args.push(...params.command);
     return args;
   },
-  run(image: string, params: DockerRunConfig) {
-    return spawn(params.dockerCommand, docker.runArgs(image, params));
+  run(params: DockerRunConfig) {
+    return spawn(params.dockerCommand, docker.runArgs(params));
   },
-  runOverSsh(image: string, config: DockerRunConfig & SshConfig) {
-    const args = [config.host];
-    config.port && args.push("-p", config.port);
-    config.extraArgs && args.push(...config.extraArgs);
-    args.push("--", config.dockerCommand, ...docker.runArgs(image, config));
+  runOverSsh(params: DockerRunConfig & SshConfig) {
+    const args = [params.host];
+    params.port && args.push("-p", params.port);
+    params.extraArgs && args.push(...params.extraArgs);
+    args.push("--", params.dockerCommand, ...docker.runArgs(params));
+    return spawn("ssh", args);
+  },
+  pullArgs(params: DockerRunConfig) {
+    const args = ["run"];
+    params.platform && args.push("--platform", params.platform);
+    args.push(params.dockerImage);
+    return args;
+  },
+  pull(params: DockerRunConfig) {
+    return spawn(params.dockerCommand, docker.pullArgs(params));
+  },
+  pullOverSsh(params: DockerRunConfig & SshConfig) {
+    const args = [params.host];
+    params.port && args.push("-p", params.port);
+    params.extraArgs && args.push(...params.extraArgs);
+    args.push("--", params.dockerCommand, ...docker.pullArgs(params));
     return spawn("ssh", args);
   },
 };

@@ -15,7 +15,7 @@ export type DockerRunConfig = {
   rm?: boolean;
   env?: { [name: string]: string };
   dockerCommand: string;
-};
+} & ArchConfig;
 
 export type SshConfig = {
   host: string;
@@ -33,4 +33,14 @@ export type SshDockerBuilder = {
   dockerCommand: string;
 } & SshConfig;
 
-export type Builder = LocalBuilder | SshDockerBuilder;
+export type SshCommandBuilder = {
+  type: "ssh-command";
+  command: string;
+} & SshConfig;
+
+export type Builder = LocalBuilder | SshDockerBuilder | SshCommandBuilder;
+
+export type ArchConfig = {
+  dockerImage: string;
+  platform: string;
+};

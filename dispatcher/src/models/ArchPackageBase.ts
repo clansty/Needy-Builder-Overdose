@@ -7,6 +7,7 @@ import log4js from "log4js";
 import date from "date-format";
 import docker from "../utils/docker";
 import { DockerRunConfig, SshConfig } from "../types/ConfigTypes";
+import wrapChildProcess from "../utils/wrapChildProcess";
 
 export default class ArchPackageBase {
   protected readonly log: log4js.Logger;
@@ -30,8 +31,8 @@ export default class ArchPackageBase {
       },
     });
     if (pkglist.status !== 0) {
-      this.log.error("makepkg --packagelist Exit code:", pkglist.status);
-      this.log.error(pkglist.stderr);
+      this.log.fatal("makepkg --packagelist Exit code:", pkglist.status);
+      this.log.fatal(pkglist.stderr);
       throw new Error(pkglist.stderr);
     }
 
@@ -71,46 +72,35 @@ export default class ArchPackageBase {
   }
 
   public build() {
-    return new Promise<void>((resolve, reject) => {
-      // 这里面应该都是 ssh 执行的命令
-      const log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`);
-      log.mark("Start building");
-      let builder: ChildProcessWithoutNullStreams;
-      const builderConfig = config.builders[this.arch];
-      const dockerConfig = {
-        volumes: {
-          "/work": this.path,
-          "/scripts": `${config.paths.program}/builder/scripts`,
-        },
-        rm: true,
-        command: ["sudo", "-u", "builder", "/scripts/build.sh"],
-        ...builderConfig,
-      };
+    // 这里面应该都是 ssh 执行的命令
+    const log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`);
+    log.mark("Start building");
+    let builder: ChildProcessWithoutNullStreams;
+    const builderConfig = config.builders[this.arch];
+    const dockerConfig = {
+      ...builderConfig,
+      ...config.arches[this.arch],
+      volumes: {
+        "/work": this.path,
+        "/scripts": `${config.paths.program}/builder/scripts`,
+      },
+      rm: true,
+      command: ["sudo", "-u", "builder", "/scripts/build.sh"],
+    };
 
-      switch (builderConfig.type) {
-        case "local": {
-          builder = docker.run(config.dockerImage, dockerConfig);
-          break;
-        }
-        case "ssh-docker": {
-          builder = docker.runOverSsh(config.dockerImage, dockerConfig as DockerRunConfig & SshConfig);
-          break;
-        }
+    switch (builderConfig.type) {
+      case "local": {
+        builder = docker.run(dockerConfig as DockerRunConfig);
+        break;
       }
-      builder.stdout.on("data", (data) => {
-        log.info(data.toString("utf8"));
-      });
-      builder.stderr.on("data", (data) => {
-        log.error(data.toString("utf8"));
-      });
-      builder.on("close", (code) => {
-        log.mark("Builder exited:", code);
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(`Builder returned ${code}`);
-        }
-      });
-    });
+      case "ssh-docker": {
+        builder = docker.runOverSsh(dockerConfig as DockerRunConfig & SshConfig);
+        break;
+      }
+      case "ssh-command":
+        // TODO
+        throw new Error("Not implemented");
+    }
+    return wrapChildProcess(builder, this.log);
   }
 }
