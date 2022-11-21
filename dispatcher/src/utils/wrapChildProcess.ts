@@ -11,7 +11,7 @@ export default (command: ChildProcessWithoutNullStreams, log: Logger) =>
       log.info(data.toString("utf8"));
     });
     command.stderr.on("data", (data) => {
-      log.error(data.toString("utf8"));
+      log.warn(data.toString("utf8"));
     });
     command.on("close", (code) => {
       log.mark("Child process exited:", code);
