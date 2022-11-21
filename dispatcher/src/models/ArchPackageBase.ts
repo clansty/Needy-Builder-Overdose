@@ -19,6 +19,25 @@ export default class ArchPackageBase {
     return path.join(config.paths.sources[this.arch], this.pkgbase);
   }
 
+  get archesSupported(): "any" | Arch[] {
+    const bash = spawnSync("bash", ["-c", "source PKGBUILD; echo $arch"], {
+      cwd: this.path,
+      encoding: "utf-8",
+    });
+    if (bash.status !== 0) {
+      this.log.fatal("bash -c 'source PKGBUILD; echo $arch' Exit code:", bash.status);
+      this.log.fatal(bash.stderr);
+      throw new Error(bash.stderr);
+    }
+
+    const arches = bash.stdout.split("\n").filter((it) => it);
+
+    if (arches[0] === "any") {
+      return "any";
+    }
+    return arches as Arch[];
+  }
+
   /**
    * 当前目录被 build 之后能得到的包文件
    */
