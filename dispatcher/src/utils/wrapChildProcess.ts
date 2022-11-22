@@ -8,10 +8,10 @@ import { Logger } from "log4js";
 export default (command: ChildProcessWithoutNullStreams, log: Logger) =>
   new Promise<void>((resolve, reject) => {
     command.stdout.on("data", (data) => {
-      log.info(data.toString("utf8"));
+      log.info(data.toString("utf8").trim());
     });
     command.stderr.on("data", (data) => {
-      log.warn(data.toString("utf8"));
+      log.warn(data.toString("utf8").trim());
     });
     command.on("close", (code) => {
       log.mark("Child process exited:", code);

@@ -2,13 +2,12 @@ import log4js from "log4js";
 import config from "../models/config";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import docker from "../utils/docker";
-import { ArchConfig, PackageInit } from "../types/ConfigTypes";
+import { ArchConfig } from "../types/ConfigTypes";
 import wrapChildProcess from "../utils/wrapChildProcess";
 import AurPackageBase from "../models/AurPackageBase";
 import { Arch } from "../types/enums";
-import date from "date-format";
 import BuildStatus from "../models/BuildStatus";
-import PackageList from "../models/PackageList";
+import UpdatedPackage from "../models/UpdatedPackage";
 
 export default class MainRunController {
   private log = log4js.getLogger("Dispatcher");
@@ -79,20 +78,26 @@ export default class MainRunController {
     }
   }
 
+  public calculateUpdatedPackages() {
+    this.log.info("Calculating updated packages...");
+    for (const arch of Object.keys(config.arches)) {
+      const archPakcages = this.status.allPackages[arch] as AurPackageBase[];
+      this.status.updatedPackages[arch].push(
+        ...archPakcages.filter((pkg) => pkg.rebuildNeeded).map((pkg) => new UpdatedPackage(pkg))
+      );
+    }
+  }
+
   public async run() {
     if (this.isRunning) {
       throw new Error("Running");
     }
     this.isRunning = true;
     this.status = new BuildStatus();
-    await this.updateDockerImages();
+    // await this.updateDockerImages();
     await this.updateSources();
-    this.log.info(
-      "All packages:",
-      Object.fromEntries(
-        Object.entries(this.status.allPackages).map(([arch, packages]) => [arch, packages.map((it) => it.pkgbase)])
-      )
-    );
+    this.calculateUpdatedPackages();
+    await this.status.saveStatus();
     this.isRunning = false;
   }
 }

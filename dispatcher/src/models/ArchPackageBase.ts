@@ -90,9 +90,8 @@ export default class ArchPackageBase {
     return this.filesToGet.some((file) => !this.filesWeHave.includes(file));
   }
 
-  public build() {
+  public build(log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`)) {
     // 这里面应该都是 ssh 执行的命令
-    const log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`);
     log.mark("Start building");
     let builder: ChildProcessWithoutNullStreams;
     const builderConfig = config.builders[this.arch];

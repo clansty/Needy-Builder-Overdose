@@ -23,15 +23,15 @@ jobs:
           - name: ubuntu-22.04
             from: ubuntu:22.04
             package-type: deb
-            platform: linux/amd64,linux/arm64
+            platform: linux/amd64,linux/arm64,linux/riscv64
           - name: ubuntu-22.10
             from: ubuntu:22.10
             package-type: deb
-            platform: linux/amd64,linux/arm64
+            platform: linux/amd64,linux/arm64,linux/riscv64
           - name: ubuntu-20.04
             from: ubuntu:20.04
             package-type: deb
-            platform: linux/amd64,linux/arm64
+            platform: linux/amd64,linux/arm64,linux/riscv64
           - name: debian-11
             from: debian:11
             package-type: deb
@@ -40,6 +40,10 @@ jobs:
             from: debian:10
             package-type: deb
             platform: linux/amd64,linux/arm64
+          - name: deepin-beige
+            from: ghcr.io/clansty/deepin-riscv:latest
+            package-type: deb
+            platform: linux/riscv64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

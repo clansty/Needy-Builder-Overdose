@@ -35,173 +35,171 @@ pacman:
   - baidunetdisk-electron
   - balena-etcher
   - bedup
-  - chromaprint-fftw
-  - clash-for-windows-bin
-  - clash-for-windows-electron-bin
-  - clash-geoip
-  - clash-premium-bin
-  - clash-premium-tun
-  - clash-tun
-  - clash-user
-  - cloudflare-wrangler
-  - com.tencent.weixin
-  - cosbrowser
-  - crossover
-  - ctcontainer
-  - curl-http3-msquic
-  - cydia-impactor
-  - davs2
-  - dduper-bin
-  - deepin-udis86
-  - deepin-wine-helper
-  - deepin-wine-plugin
-  - deepin-wine-plugin-virtual
-  - deepin-wine-wechat
-  - deepin-wine5
-  - p: deepin-wine6-stable
-    extraDeps: lib32-udis86-git
-  - ddns-go-bin
-  - discord_arch_electron
-  - disman-kwinft
-  - droidcam
-  - electron-bin
-  - electron20-bin
-  - electron19-bin
-  - electron18-bin
-  - electron17-bin
-  - electron16-bin
-  - electron15-bin
-  - electron14-bin
-  - electron13-bin
-  - electron12-bin
-  - etcher-bin
-  - finalshell
-  - flite1-patched
-  - glib2-static
-  - google-chrome
-  - gphotos-sync
-  - guacamole-client
-  - guacamole-server
-  - hamradio-menus
-  - hfsprogs
-  - howdy
-  - hyfetch
-  - intellij-idea-ultimate-edition
-  - jadx-gui-desktop
-  - jetbrains-gateway
-  - kdisplay-kwinft
-  - kwin-bismuth
-  - layan-cursor-theme-git
-  - lensfun-git
-  - lib32-avahi
-  - lib32-gd
-  - lib32-gdbm
-  - lib32-libgphoto2
-  - lib32-libheif
-  - lib32-libraqm
-  - lib32-libxpm
-  - lib32-pciutils
-  - lib32-poppler
-  - lib32-sane
-  - libffi-static
-  - libklvanc-git
-  - libldap24
-  - librist
-  - limine
-  - linux-apfs-rw-dkms-git
-  - loongarch64-linux-gnu-binutils
-  - loongarch64-linux-gnu-linux-api-headers
-  - marktext-bin
-  - mcpelauncher-linux-git
-  - mcpelauncher-msa-git
-  - mcpelauncher-msa-ui-qt-git
-  - mcpelauncher-ui-git
-  - microsoft-edge-beta-bin
-  - microsoft-edge-stable-bin
-  - miredo
-  - mkinitcpio-transflag
-  - mongodb
-  - mongodb-compass
-  - mongodb-tools
-  - musikcube
-  - netease-music-sync
-  - netease-music-tui
-  - nodejs-http-server
-  - nodestatus-client-go
-  - noto-color-emoji-fontconfig
-  - nvidia-470xx-utils
-  - nvidia-prime-select-git
-  - nvidia-utils-nvlax
-  - openssl-static
-  - osu-lazer
-  - pam-python
-  - pcre-static
-  - picom-jonaburg-git
-  - pocketsphinx
-  - pycharm-professional
-  - python-applicationinsights
-  - python-azure-cli
-  - python-azure-git
-  - python-azure-multiapi-storage
-  - python-exif
-  - python-face_recognition
-  - python-face_recognition_models
-  - python-hypyutils
-  - python-knack
-  - python-msrest
-  - python-msrestazure
-  - python-plum
-  - python-scp
-  - python-types-pyyaml
-  - python-types-requests
-  - python-vsts-cd-manager
-  - rdm-bin
-  - realvnc-vnc-server
-  - realvnc-vnc-viewer
-  - redis-desktop-manager
-  - rider
-  - rockchip-mpp
-  - sddm-sugar-candy-git
-  - shine
-  - slack-electron
-  - smallpdf-desktop
-  - storageexplorer
-  - sunloginclient
-  - sway-launcher-desktop
-  - systemd-cron
-  - texlive-full
-  - trustedqsl
-  - ttf-all-the-icons
-  - ttf-meslo
-  - ttf-menlo-powerline-git
-  - ttf-twemoji
-  - ttf-twemoji-color
-  - typora-free
-  - uavs3d
-  - uavs3d-git
-  - usbfluxd
-  - uuid
-  - p: visual-paradigm
-    aarch64: true
-  - p: visual-paradigm-community
-    aarch64: true
-  - visual-studio-code-bin
-  - vo-amrwbenc
-  - p: webstorm
-    aarch64: true
-  - wechat-uos
-  - wemeet-bin
-  - wps-office
-  - wps-office-cn
-  - wrapland-kwinft
-  - wxgtk2.8
-  - xavs
-  - xavs2
-  - yade
-  - yesplaymusic
-  - yesplaymusic-electron
-  - zfs-dkms
-  - zfs-linux
-  - zfs-linux-lts
-  - zfs-linux-zen
-  - zfs-utils
+  # - chromaprint-fftw
+  # - clash-for-windows-bin
+  # - clash-for-windows-electron-bin
+  # - clash-geoip
+  # - clash-premium-bin
+  # - clash-premium-tun
+  # - clash-tun
+  # - clash-user
+  # - cloudflare-wrangler
+  # - com.tencent.weixin
+  # - cosbrowser
+  # - crossover
+  # - ctcontainer
+  # - curl-http3-msquic
+  # - cydia-impactor
+  # - davs2
+  # - dduper-bin
+  # - deepin-udis86
+  # - deepin-wine-helper
+  # - deepin-wine-plugin
+  # - deepin-wine-plugin-virtual
+  # - deepin-wine-wechat
+  # - deepin-wine5
+  # - p: deepin-wine6-stable
+  #   extraDeps: lib32-udis86-git
+  # - ddns-go-bin
+  # - discord_arch_electron
+  # - disman-kwinft
+  # - droidcam
+  # - electron-bin
+  # - electron20-bin
+  # - electron19-bin
+  # - electron18-bin
+  # - electron17-bin
+  # - electron16-bin
+  # - electron15-bin
+  # - electron14-bin
+  # - electron13-bin
+  # - electron12-bin
+  # - etcher-bin
+  # - finalshell
+  # - flite1-patched
+  # - glib2-static
+  # - google-chrome
+  # - gphotos-sync
+  # - guacamole-client
+  # - guacamole-server
+  # - hamradio-menus
+  # - hfsprogs
+  # - howdy
+  # - hyfetch
+  # - intellij-idea-ultimate-edition
+  # - jadx-gui-desktop
+  # - jetbrains-gateway
+  # - kdisplay-kwinft
+  # - kwin-bismuth
+  # - layan-cursor-theme-git
+  # - lensfun-git
+  # - lib32-avahi
+  # - lib32-gd
+  # - lib32-gdbm
+  # - lib32-libgphoto2
+  # - lib32-libheif
+  # - lib32-libraqm
+  # - lib32-libxpm
+  # - lib32-pciutils
+  # - lib32-poppler
+  # - lib32-sane
+  # - libffi-static
+  # - libklvanc-git
+  # - libldap24
+  # - librist
+  # - limine
+  # - linux-apfs-rw-dkms-git
+  # - marktext-bin
+  # - mcpelauncher-linux-git
+  # - mcpelauncher-msa-git
+  # - mcpelauncher-msa-ui-qt-git
+  # - mcpelauncher-ui-git
+  # - microsoft-edge-beta-bin
+  # - microsoft-edge-stable-bin
+  # - miredo
+  # - mkinitcpio-transflag
+  # - mongodb
+  # - mongodb-compass
+  # - mongodb-tools
+  # - musikcube
+  # - netease-music-sync
+  # - netease-music-tui
+  # - nodejs-http-server
+  # - nodestatus-client-go
+  # - noto-color-emoji-fontconfig
+  # - nvidia-470xx-utils
+  # - nvidia-prime-select-git
+  # - nvidia-utils-nvlax
+  # - openssl-static
+  # - osu-lazer
+  # - pam-python
+  # - pcre-static
+  # - picom-jonaburg-git
+  # - pocketsphinx
+  # - pycharm-professional
+  # - python-applicationinsights
+  # - python-azure-cli
+  # - python-azure-git
+  # - python-azure-multiapi-storage
+  # - python-exif
+  # - python-face_recognition
+  # - python-face_recognition_models
+  # - python-hypyutils
+  # - python-knack
+  # - python-msrest
+  # - python-msrestazure
+  # - python-plum
+  # - python-scp
+  # - python-types-pyyaml
+  # - python-types-requests
+  # - python-vsts-cd-manager
+  # - rdm-bin
+  # - realvnc-vnc-server
+  # - realvnc-vnc-viewer
+  # - redis-desktop-manager
+  # - rider
+  # - rockchip-mpp
+  # - sddm-sugar-candy-git
+  # - shine
+  # - slack-electron
+  # - smallpdf-desktop
+  # - storageexplorer
+  # - sunloginclient
+  # - sway-launcher-desktop
+  # - systemd-cron
+  # - texlive-full
+  # - trustedqsl
+  # - ttf-all-the-icons
+  # - ttf-meslo
+  # - ttf-menlo-powerline-git
+  # - ttf-twemoji
+  # - ttf-twemoji-color
+  # - typora-free
+  # - uavs3d
+  # - uavs3d-git
+  # - usbfluxd
+  # - uuid
+  # - p: visual-paradigm
+  #   aarch64: true
+  # - p: visual-paradigm-community
+  #   aarch64: true
+  # - visual-studio-code-bin
+  # - vo-amrwbenc
+  # - p: webstorm
+  #   aarch64: true
+  # - wechat-uos
+  # - wemeet-bin
+  # - wps-office
+  # - wps-office-cn
+  # - wrapland-kwinft
+  # - wxgtk2.8
+  # - xavs
+  # - xavs2
+  # - yade
+  # - yesplaymusic
+  # - yesplaymusic-electron
+  # - zfs-dkms
+  # - zfs-linux
+  # - zfs-linux-lts
+  # - zfs-linux-zen
+  # - zfs-utils
