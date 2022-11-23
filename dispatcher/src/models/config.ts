@@ -11,7 +11,9 @@ export default YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
     sources: { [key in Arch]: string };
     logs: string;
     program: string;
+    repo: string;
   };
   pacman: Array<PackageInit>;
   arches: { [key in Arch]: ArchConfig };
+  repoName: string;
 };

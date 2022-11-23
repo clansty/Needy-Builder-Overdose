@@ -41,7 +41,7 @@ export default class ArchPackageBase {
   /**
    * 当前目录被 build 之后能得到的包文件
    */
-  get filesToGet() {
+  private get filesToGet() {
     const pkglist = spawnSync("makepkg", ["--packagelist"], {
       cwd: this.path,
       encoding: "utf-8",
@@ -65,17 +65,25 @@ export default class ArchPackageBase {
   /**
    * pkgfiles 中包含的上次 build 结果
    */
-  get filesWeHave() {
+  private get filesWeHaveBasenames() {
     try {
       const pkgfiles = fs.readFileSync(path.join(this.path, "pkgfiles"), "utf-8");
       return pkgfiles
         .split("\n")
         .filter((it) => it)
         .map((line) => path.basename(line))
-        .map((line) => line.substring(0, line.indexOf(".pkg.tar")));
     } catch {
       return [];
     }
+  }
+
+  private get filesWeHaveBasenamesWithoutExts() {
+    return this.filesWeHaveBasenames.map((line) => line.substring(0, line.indexOf(".pkg.tar")));
+  }
+
+  // 包含完整路径
+  public get filesWeHave() {
+    return this.filesWeHaveBasenames.map((file) => path.join(this.path, file));
   }
 
   /**
@@ -84,10 +92,13 @@ export default class ArchPackageBase {
   get rebuildNeeded() {
     const pkgbuild = fs.readFileSync(path.join(this.path, "PKGBUILD"), "utf-8");
     if (pkgbuild.includes("pkgver()")) {
+      this.log.trace("-git");
       // 应该是个 -git 包
       return true;
     }
-    return this.filesToGet.some((file) => !this.filesWeHave.includes(file));
+    this.log.trace("this.filesWeHaveBasenamesWithoutExts", this.filesWeHaveBasenamesWithoutExts);
+    this.log.trace("this.filesToGet", this.filesToGet);
+    return this.filesToGet.some((file) => !this.filesWeHaveBasenamesWithoutExts.includes(file));
   }
 
   public build(log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`)) {

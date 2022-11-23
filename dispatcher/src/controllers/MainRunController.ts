@@ -9,12 +9,20 @@ import { Arch } from "../types/enums";
 import BuildStatus from "../models/BuildStatus";
 import UpdatedPackage from "../models/UpdatedPackage";
 import date from "date-format";
+import PackageList from "../models/PackageList";
+import ArchRepo from "../models/ArchRepo";
 
 export default class MainRunController {
   private log = log4js.getLogger("Dispatcher");
 
   private isRunning = false;
   private status: BuildStatus;
+  private repos = new PackageList((arch) => new ArchRepo(arch));
+
+  private recordError(message: string) {
+    this.status.errors.push(message);
+    this.log.error(message);
+  }
 
   private async updateDockerImages() {
     for (const [arch, builder] of Object.entries(config.builders)) {
@@ -36,7 +44,7 @@ export default class MainRunController {
         await wrapChildProcess(command, log4js.getLogger(`UpdateDocker.${arch}`));
         this.log.info("Update docker image for", arch, "builder done");
       } catch (error) {
-        this.log.error("Unable to update docker image for", arch, "builder");
+        this.recordError(`Unable to update docker image for ${arch} builder`);
       }
     }
   }
@@ -48,10 +56,11 @@ export default class MainRunController {
       const pkg = new AurPackageBase(pkgInit, "x86_64");
       this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
       try {
-        // await pkg.updateSource();
+        await pkg.updateSource();
         this.status.allPackages.x86_64.push(pkg);
       } catch (error) {
         this.log.error(pkg.pkgbase, error);
+        this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
         continue;
       }
       let arches = pkg.archesSupported;
@@ -69,10 +78,11 @@ export default class MainRunController {
         const pkg = new AurPackageBase(pkgInit, arch);
         this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
         try {
-          // await pkg.updateSource();
+          await pkg.updateSource();
           this.status.allPackages[arch].push(pkg);
         } catch (error) {
           this.log.error(pkg.pkgbase, error);
+          this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
           continue;
         }
       }
@@ -96,18 +106,27 @@ export default class MainRunController {
         new Promise<void>(async (resolve) => {
           const packages = this.status.updatedPackages[arch] as UpdatedPackage[];
           for (const pkg of packages) {
+            await this.status.saveStatus();
             this.log.info(arch, "builder start building", pkg.pkg.pkgbase);
             pkg.buildDate = new Date();
             try {
               await pkg.pkg.build(
                 getLogger(`Build.${pkg.pkg.pkgbase}-${arch}.${date("yyyy-MM-dd.hhmmss", pkg.buildDate)}`)
               );
-              // TODO: add to repo
               pkg.success = true;
             } catch (error) {
-              this.status.errors.push(`${pkg.pkg.pkgbase}-${arch}: Build failed`);
+              this.recordError(`${pkg.pkg.pkgbase}-${arch}: Build failed`);
+              continue;
             }
-            await this.status.saveStatus();
+            try {
+              const repo = this.repos[arch] as ArchRepo;
+              this.log.info(arch, "adding", pkg.pkg.pkgbase, "to repo");
+              await repo.addPackage(pkg.pkg.filesWeHave);
+            } catch (error) {
+              this.recordError(`${pkg.pkg.pkgbase}-${arch}: Add to repo failed`);
+              this.log.error(error);
+              continue;
+            }
           }
           resolve();
         })
@@ -121,10 +140,9 @@ export default class MainRunController {
     }
     this.isRunning = true;
     this.status = new BuildStatus();
-    // await this.updateDockerImages();
+    await this.updateDockerImages();
     await this.updateSources();
     this.calculateUpdatedPackages();
-    await this.status.saveStatus();
     await this.buildPackages();
     this.isRunning = false;
   }

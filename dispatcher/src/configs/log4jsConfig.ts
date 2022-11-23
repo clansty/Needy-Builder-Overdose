@@ -22,11 +22,18 @@ export default {
       property: "categoryName",
       extension: ".log",
     },
+    repo: {
+      type: "multiFile",
+      base: path.join(config.paths.logs, "repos") + "/",
+      property: "categoryName",
+      extension: ".log",
+    },
     console: { type: "console" },
   },
   categories: {
     default: { appenders: ["dispatcher", "console"], level: "trace" },
     Build: { appenders: ["build", "console"], level: "trace" },
     Package: { appenders: ["package", "console"], level: "trace" },
+    Repo: { appenders: ["repo", "console"], level: "trace" },
   },
 };
