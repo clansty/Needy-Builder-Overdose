@@ -1,4 +1,4 @@
-import log4js from "log4js";
+import log4js, { getLogger } from "log4js";
 import config from "../models/config";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import docker from "../utils/docker";
@@ -8,6 +8,7 @@ import AurPackageBase from "../models/AurPackageBase";
 import { Arch } from "../types/enums";
 import BuildStatus from "../models/BuildStatus";
 import UpdatedPackage from "../models/UpdatedPackage";
+import date from "date-format";
 
 export default class MainRunController {
   private log = log4js.getLogger("Dispatcher");
@@ -47,7 +48,7 @@ export default class MainRunController {
       const pkg = new AurPackageBase(pkgInit, "x86_64");
       this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
       try {
-        await pkg.updateSource();
+        // await pkg.updateSource();
         this.status.allPackages.x86_64.push(pkg);
       } catch (error) {
         this.log.error(pkg.pkgbase, error);
@@ -68,7 +69,7 @@ export default class MainRunController {
         const pkg = new AurPackageBase(pkgInit, arch);
         this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
         try {
-          await pkg.updateSource();
+          // await pkg.updateSource();
           this.status.allPackages[arch].push(pkg);
         } catch (error) {
           this.log.error(pkg.pkgbase, error);
@@ -78,7 +79,7 @@ export default class MainRunController {
     }
   }
 
-  public calculateUpdatedPackages() {
+  private calculateUpdatedPackages() {
     this.log.info("Calculating updated packages...");
     for (const arch of Object.keys(config.arches)) {
       const archPakcages = this.status.allPackages[arch] as AurPackageBase[];
@@ -86,6 +87,32 @@ export default class MainRunController {
         ...archPakcages.filter((pkg) => pkg.rebuildNeeded).map((pkg) => new UpdatedPackage(pkg))
       );
     }
+  }
+
+  private buildPackages() {
+    // 并行构建每个架构的包，因为它们不在同一个机器上
+    const promises = Object.keys(config.arches).map(
+      (arch) =>
+        new Promise<void>(async (resolve) => {
+          const packages = this.status.updatedPackages[arch] as UpdatedPackage[];
+          for (const pkg of packages) {
+            this.log.info(arch, "builder start building", pkg.pkg.pkgbase);
+            pkg.buildDate = new Date();
+            try {
+              await pkg.pkg.build(
+                getLogger(`Build.${pkg.pkg.pkgbase}-${arch}.${date("yyyy-MM-dd.hhmmss", pkg.buildDate)}`)
+              );
+              // TODO: add to repo
+              pkg.success = true;
+            } catch (error) {
+              this.status.errors.push(`${pkg.pkg.pkgbase}-${arch}: Build failed`);
+            }
+            await this.status.saveStatus();
+          }
+          resolve();
+        })
+    );
+    return Promise.all(promises);
   }
 
   public async run() {
@@ -98,6 +125,7 @@ export default class MainRunController {
     await this.updateSources();
     this.calculateUpdatedPackages();
     await this.status.saveStatus();
+    await this.buildPackages();
     this.isRunning = false;
   }
 }

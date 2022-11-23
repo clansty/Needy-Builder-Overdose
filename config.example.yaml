@@ -1,12 +1,17 @@
 builders:
   aarch64:
-    type: ssh-docker
-    dockerCommand: docker
-    host: builder@172.16.0.81
+    type: local
+    dockerCommand: nerdctl
   x86_64:
-    type: ssh-docker
-    dockerCommand: docker
-    host: builder@172.16.0.86
+    type: local
+    dockerCommand: nerdctl
+    # type: ssh-docker
+    # dockerCommand: docker
+    # host: builder@172.16.0.81
+  # x86_64:
+  #   type: ssh-docker
+  #   dockerCommand: docker
+  #   host: builder@172.16.0.86
 paths:
   sources:
     x86_64: /pkgbuilder-work/x86_64
@@ -15,8 +20,8 @@ paths:
     loong64: /pkgbuilder-work/loong64
     riscv64: /pkgbuilder-work/riscv64
   logs: /pkgbuilder-work/logs
-  # program: /home/clansty.linux/Projects/Needy-Builder-Overdose
-  program: /pkgbuilder-work/program
+  program: /home/clansty.linux/Projects/Needy-Builder-Overdose
+  # program: /pkgbuilder-work/program
 
 arches: 
   x86_64:

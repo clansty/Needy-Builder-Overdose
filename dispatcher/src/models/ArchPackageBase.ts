@@ -119,6 +119,6 @@ export default class ArchPackageBase {
         // TODO
         throw new Error("Not implemented");
     }
-    return wrapChildProcess(builder, this.log);
+    return wrapChildProcess(builder, log);
   }
 }

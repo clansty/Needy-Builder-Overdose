@@ -42,11 +42,20 @@ export default class BuildStatus {
       errors: this.errors,
     };
     await fsP.writeFile(this.statusFile, JSON.stringify(json));
-    fs.existsSync(this.currentFile) && (await fsP.unlink(this.currentFile));
-    await fsP.symlink(this.statusFile, this.currentFile);
+    await this.checkAndLinkFile(this.statusFile, this.currentFile);
     if (linkLastFile) {
-      fs.existsSync(this.lastFile) && (await fsP.unlink(this.lastFile));
-      await fsP.symlink(this.statusFile, this.lastFile);
+      await this.checkAndLinkFile(this.statusFile, this.lastFile);
     }
+  }
+
+  private async checkAndLinkFile(src: string, dist: string) {
+    const existed = await fs.existsSync(dist);
+    if (existed && (await fsP.readlink(dist)) === src) {
+      return;
+    }
+    if (existed) {
+      await fsP.unlink(dist);
+    }
+    await fsP.symlink(src, dist);
   }
 }
