@@ -1,3 +1,4 @@
+import parseArchDbPackageInfo from "../utils/parseArchDbPackageInfo";
 import { Arch } from "./enums";
 
 export type PackageInit =
@@ -43,4 +44,15 @@ export type Builder = LocalBuilder | SshDockerBuilder | SshCommandBuilder;
 export type ArchConfig = {
   dockerImage: string;
   platform: string;
+};
+
+export type ArchBuiltPackageMeta = Awaited<ReturnType<typeof parseArchDbPackageInfo>>;
+
+export type ArchRepoInfoEntry = {
+  meta: ArchBuiltPackageMeta;
+  status?: {
+    lastBuildSuccess: boolean;
+    lastBuildAttempt: Date;
+    url?: string;
+  };
 };

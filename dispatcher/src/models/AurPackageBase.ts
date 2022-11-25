@@ -15,6 +15,10 @@ export default class AurPackageBase extends ArchPackageBase {
     return `https://aur.archlinux.org/${this.pkgbase}.git`;
   }
 
+  get aurUrl() {
+    return `https://aur.archlinux.org/packages/${this.pkgbase}`;
+  }
+
   public updateSource() {
     const dirExists = fs.existsSync(this.path);
     let command: ChildProcessWithoutNullStreams;

@@ -2,7 +2,7 @@ import log4js, { getLogger } from "log4js";
 import config from "../models/config";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import docker from "../utils/docker";
-import { ArchConfig } from "../types/ConfigTypes";
+import { ArchBuiltPackageMeta, ArchConfig, ArchRepoInfoEntry } from "../types/ConfigTypes";
 import wrapChildProcess from "../utils/wrapChildProcess";
 import AurPackageBase from "../models/AurPackageBase";
 import { Arch } from "../types/enums";
@@ -11,6 +11,14 @@ import UpdatedPackage from "../models/UpdatedPackage";
 import date from "date-format";
 import PackageList from "../models/PackageList";
 import ArchRepo from "../models/ArchRepo";
+import fsP from "fs/promises";
+import fs from "fs";
+import path from "path";
+import os from "os";
+import decompress from "decompress";
+import decompressTarxz from "decompress-tarxz";
+import parseArchDbPackageInfo from "../utils/parseArchDbPackageInfo";
+import checkAndLinkFile from "../utils/checkAndLinkFile";
 
 export default class MainRunController {
   private log = log4js.getLogger("Dispatcher");
@@ -134,6 +142,50 @@ export default class MainRunController {
     return Promise.all(promises);
   }
 
+  private async generateRepoInfo() {
+    const linkFilePath = path.join(config.paths.logs, "repoInfo.json");
+    const currentFilePath = path.join(
+      config.paths.logs,
+      `repoInfo.${date("yyyy-MM-dd.hhmmss", this.status.startTime)}.json`
+    );
+    const repoInfo = new PackageList<ArchRepoInfoEntry[]>(() => []);
+    // 先读之前结果
+    let lastInfo = new PackageList<ArchRepoInfoEntry[]>(() => []);
+    if (fs.existsSync(linkFilePath)) {
+      lastInfo = JSON.parse(await fsP.readFile(linkFilePath, "utf-8"));
+    }
+    // 遍历架构
+    for (const arch of Object.keys(repoInfo)) {
+      const repo = this.repos[arch] as ArchRepo;
+      if (!fs.existsSync(repo.dbPath)) continue;
+      // 解包 db
+      const extractPath = await fsP.mkdtemp(path.join(os.tmpdir(), "extract-repo-"));
+      await decompress(repo.dbPath, extractPath, {
+        plugins: [decompressTarxz()],
+      });
+      // 遍历包
+      for (const pkg of await fsP.readdir(extractPath)) {
+        const meta = await parseArchDbPackageInfo(path.join(extractPath, pkg));
+        // 这次打包状态更新的话就用这次状态，否则就用三次的状态
+        const currentStatus = (this.status.updatedPackages[arch] as UpdatedPackage[]).find(
+          (it) => it.pkg.pkgbase === meta.base
+        );
+        (repoInfo[arch] as ArchRepoInfoEntry[]).push({
+          meta,
+          status: currentStatus
+            ? {
+                lastBuildAttempt: currentStatus.buildDate,
+                lastBuildSuccess: currentStatus.success,
+                url: currentStatus.pkg.aurUrl,
+              }
+            : (lastInfo[arch] as ArchRepoInfoEntry[]).find((it) => it.meta.name === meta.name)?.status,
+        });
+      }
+    }
+    await fsP.writeFile(currentFilePath, JSON.stringify(repoInfo), "utf-8");
+    await checkAndLinkFile(currentFilePath, linkFilePath);
+  }
+
   public async run() {
     if (this.isRunning) {
       throw new Error("Running");
@@ -144,6 +196,9 @@ export default class MainRunController {
     await this.updateSources();
     this.calculateUpdatedPackages();
     await this.buildPackages();
+    this.status.endTime = new Date();
+    await this.status.saveStatus();
+    await this.generateRepoInfo();
     this.isRunning = false;
   }
 }
