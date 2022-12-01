@@ -1,14 +1,15 @@
-import fsP from "fs/promises";
 import fs from "fs";
 
 // ln -sf
-export default async (src: string, dist: string) => {
-  const existed = fs.existsSync(dist);
-  if (existed && (await fsP.readlink(dist)) === src) {
-    return;
-  }
-  if (existed) {
-    await fsP.unlink(dist);
-  }
-  await fsP.symlink(src, dist);
+export default (src: string, dist: string) => {
+  try {
+    const existed = fs.existsSync(dist);
+    if (existed && fs.readlinkSync(dist) === src) {
+      return;
+    }
+    if (existed) {
+      fs.unlinkSync(dist);
+    }
+    fs.symlinkSync(src, dist);
+  } catch (error) {}
 };

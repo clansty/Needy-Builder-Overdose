@@ -21,6 +21,7 @@ export default class ArchRepo extends RepoBase {
 
   protected async _addPackage(pkgPath: string[]): Promise<void> {
     const repoFiles = pkgPath.map((it) => path.join(this.path, path.basename(it)));
+    this.log.trace(pkgPath, repoFiles);
     for (const file of repoFiles) {
       try {
         await fsP.unlink(file);

@@ -129,6 +129,7 @@ export default class MainRunController {
             try {
               const repo = this.repos[arch] as ArchRepo;
               this.log.info(arch, "adding", pkg.pkg.pkgbase, "to repo");
+              this.log.trace(pkg.pkg.filesWeHave);
               await repo.addPackage(pkg.pkg.filesWeHave);
             } catch (error) {
               this.recordError(`${pkg.pkg.pkgbase}-${arch}: Add to repo failed`);

@@ -42,7 +42,7 @@ export default class ArchPackageBase {
    * 当前目录被 build 之后能得到的包文件
    */
   private get filesToGet() {
-    const pkglist = spawnSync("makepkg", ["--packagelist"], {
+    const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist"], {
       cwd: this.path,
       encoding: "utf-8",
       env: {
@@ -59,7 +59,7 @@ export default class ArchPackageBase {
       .split("\n")
       .filter((it) => it)
       .map((line) => path.basename(line))
-      .map((line) => line.substring(0, line.indexOf(".pkg.tar")));
+      .map((line) => line.substring(0, line.indexOf(".pkg.tar")))
   }
 
   /**
@@ -71,7 +71,7 @@ export default class ArchPackageBase {
       return pkgfiles
         .split("\n")
         .filter((it) => it)
-        .map((line) => path.basename(line))
+        .map((line) => path.basename(line));
     } catch {
       return [];
     }
