@@ -23,17 +23,20 @@ export default class ArchPackageBase {
   }
 
   get archesSupported(): "any" | Arch[] {
-    const bash = spawnSync("bash", ["-c", "source PKGBUILD; echo $arch"], {
+    const bash = spawnSync("bash", ["-c", "source PKGBUILD; echo ${arch[@]}"], {
       cwd: this.path,
       encoding: "utf-8",
     });
     if (bash.status !== 0) {
-      this.log.fatal("bash -c 'source PKGBUILD; echo $arch' Exit code:", bash.status);
+      this.log.fatal("bash -c 'source PKGBUILD; echo ${arch[@]}' Exit code:", bash.status);
       this.log.fatal(bash.stderr);
       throw new Error(bash.stderr);
     }
 
-    const arches = bash.stdout.split("\n").filter((it) => it);
+    const arches = bash.stdout
+      .trim()
+      .split(" ")
+      .filter((it) => it);
 
     if (arches[0] === "any") {
       return "any";
