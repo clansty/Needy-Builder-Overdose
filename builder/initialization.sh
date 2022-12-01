@@ -8,6 +8,21 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         else
             echo 'Server = http://mirrors.gigenet.com/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
         fi
+    else
+    echo '
+[Clansty]
+SigLevel = Never
+Server = https://repo.lwqwq.com/archlinux/$arch
+Server = https://pacman.ltd/archlinux/$arch
+Server = https://repo.clansty.com/archlinux/$arch
+
+[menci]
+SigLevel = Never
+Server = https://aur.men.ci/archlinux/$arch
+
+[archlinuxcn]
+Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux-cn/$arch
+    ' >> /etc/pacman.conf
     fi
 
     pacman -Syu base-devel --noconfirm --needed
