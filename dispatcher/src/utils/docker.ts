@@ -32,7 +32,7 @@ const docker = {
     return spawn("ssh", args);
   },
   pullArgs(params: DockerRunConfig) {
-    const args = ["run"];
+    const args = ["pull"];
     params.platform && args.push("--platform", params.platform);
     args.push(params.dockerImage);
     return args;
