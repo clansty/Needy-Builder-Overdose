@@ -1,9 +1,13 @@
 {
-  "name": "source-manager",
+  "name": "dispatcher",
   "version": "1.0.0",
   "main": "src/index.ts",
   "private": true,
   "keywords": [],
+  "bin": "build/index.js",
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts"
@@ -24,6 +28,7 @@
     "decompress": "^4.2.1",
     "decompress-tarxz": "^3.0.0",
     "log4js": "^6.7.0",
+    "sleep-promise": "^9.1.0",
     "yaml": "^2.1.3"
   }
 }

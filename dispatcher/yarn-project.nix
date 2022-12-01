@@ -66,7 +66,7 @@ let
   # Main project derivation.
   project = stdenv.mkDerivation (drvCommon // {
     inherit src;
-    name = "source-manager";
+    name = "dispatcher";
 
     configurePhase = ''
       ${buildVars}
@@ -325,6 +325,7 @@ cacheEntries = {
 "semver@npm:7.3.8" = { filename = "semver-npm-7.3.8-25a996cb4f-ba9c7cbbf2.zip"; sha512 = "ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1"; };
 "set-blocking@npm:2.0.0" = { filename = "set-blocking-npm-2.0.0-49e2cffa24-6e65a05f7c.zip"; sha512 = "6e65a05f7cf7ebdf8b7c75b101e18c0b7e3dff4940d480efed8aad3a36a4005140b660fa1d804cb8bce911cac290441dc728084a30504d3516ac2ff7ad607b02"; };
 "signal-exit@npm:3.0.7" = { filename = "signal-exit-npm-3.0.7-bd270458a3-a2f098f247.zip"; sha512 = "a2f098f247adc367dffc27845853e9959b9e88b01cb301658cfe4194352d8d2bb32e18467c786a7fe15f1d44b233ea35633d076d5e737870b7139949d1ab6318"; };
+"sleep-promise@npm:9.1.0" = { filename = "sleep-promise-npm-9.1.0-d83e95aee1-a93359c18d.zip"; sha512 = "a93359c18d2e4d586f2ecd4575cbdbc92bcbd9d387bd4bca249892abb512ca4e80075f67e53ec1279ea4555e8a1f6dc9df9e90f8aa71178ad943e9ba1f27debb"; };
 "smart-buffer@npm:4.2.0" = { filename = "smart-buffer-npm-4.2.0-5ac3f668bb-b5167a7142.zip"; sha512 = "b5167a7142c1da704c0e3af85c402002b597081dd9575031a90b4f229ca5678e9a36e8a374f1814c8156a725d17008ae3bde63b92f9cfd132526379e580bec8b"; };
 "socks-proxy-agent@npm:7.0.0" = { filename = "socks-proxy-agent-npm-7.0.0-7aacf32ea0-7205543701.zip"; sha512 = "720554370154cbc979e2e9ce6a6ec6ced205d02757d8f5d93fe95adae454fc187a5cbfc6b022afab850a5ce9b4c7d73e0f98e381879cf45f66317a4895953846"; };
 "socks@npm:2.7.1" = { filename = "socks-npm-2.7.1-17f2b53052-259d9e3e8e.zip"; sha512 = "259d9e3e8e1c9809a7f5c32238c3d4d2a36b39b83851d0f573bfde5f21c4b1288417ce1af06af1452569cd1eb0841169afd4998f0e04ba04656f6b7f0e46d748"; };

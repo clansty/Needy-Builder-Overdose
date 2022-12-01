@@ -1,18 +1,17 @@
 repoName: Clansty
 builders:
   aarch64:
-    type: local
-    dockerCommand: nerdctl
-  # x86_64:
-  #   type: local
-  #   dockerCommand: nerdctl
-    # type: ssh-docker
-    # dockerCommand: docker
-    # host: builder@172.16.0.81
-  # x86_64:
-  #   type: ssh-docker
-  #   dockerCommand: docker
-  #   host: builder@172.16.0.86
+    type: ssh-docker
+    dockerCommand: docker
+    host: builder@172.16.0.81
+  x86_64:
+    type: ssh-docker
+    dockerCommand: docker
+    host: builder@172.16.0.87
+  riscv64:
+    type: ssh-docker
+    dockerCommand: docker
+    host: builder@172.16.0.86
 paths:
   sources:
     x86_64: /pkgbuilder-work/x86_64
@@ -21,17 +20,19 @@ paths:
     loong64: /pkgbuilder-work/loong64
     riscv64: /pkgbuilder-work/riscv64
   logs: /pkgbuilder-work/logs
-  program: /home/clansty.linux/Projects/Needy-Builder-Overdose
   repo: /pkgbuilder-work/repo
-  # program: /pkgbuilder-work/program
+  program: /pkgbuilder-work/program
 
-arches: 
-  # x86_64:
-  #   dockerImage: ghcr.io/clansty/package-builder:archlinux
-  #   platform: linux/amd64
+arches:
+  x86_64:
+    dockerImage: ghcr.io/clansty/package-builder:archlinux
+    platform: linux/amd64
   aarch64:
     dockerImage: ghcr.io/clansty/package-builder:archlinux
     platform: linux/arm64
+  riscv64:
+    dockerImage: ghcr.io/clansty/package-builder:archlinux
+    platform: linux/riscv64
 
 pacman:
   - alist-bin

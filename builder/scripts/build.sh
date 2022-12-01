@@ -5,7 +5,9 @@ cd /work
 yay -Syu --noconfirm --nouseask
 
 echo 'PACKAGER="Clansty <i@gao4.pw>"
-COMPRESSZST=(zstd -19 -c -z -q --threads=0 -)' > ~/.makepkg.conf
+COMPRESSZST=(zstd -19 -c -z -q --threads=0 -)
+MAKEFLAGS="-j$(nproc)"
+BUILDDIR=/tmp/makepkg' > ~/.makepkg.conf
 
 sudo chmod 777 /work
 

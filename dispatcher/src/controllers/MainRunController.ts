@@ -2,7 +2,7 @@ import log4js, { getLogger } from "log4js";
 import config from "../models/config";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import docker from "../utils/docker";
-import { ArchBuiltPackageMeta, ArchConfig, ArchRepoInfoEntry } from "../types/ConfigTypes";
+import { ArchConfig, ArchRepoInfoEntry } from "../types/ConfigTypes";
 import wrapChildProcess from "../utils/wrapChildProcess";
 import AurPackageBase from "../models/AurPackageBase";
 import { Arch } from "../types/enums";

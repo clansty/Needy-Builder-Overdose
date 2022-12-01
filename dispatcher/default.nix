@@ -3,4 +3,12 @@
 
 { pkgs ? import <nixpkgs> { } }:
 
-pkgs.callPackage ./yarn-project.nix { } { src = ./.; }
+(pkgs.callPackage ./yarn-project.nix { } { src = ./.; }).overrideAttrs (attrs: {
+  buildPhase = with pkgs; ''
+    yarn build
+  '';
+  nativeBuildInputs = attrs.buildInputs ++ (with pkgs; [
+    python3
+    pkg-config
+  ]);
+})
