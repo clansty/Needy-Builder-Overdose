@@ -8,6 +8,7 @@ export type PackageInit =
     } & {
       p: string;
       extraDeps: string;
+      ignorePkgs: string;
     });
 
 export type DockerRunConfig = {

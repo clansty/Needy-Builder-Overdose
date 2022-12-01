@@ -9,6 +9,10 @@ export default class AurPackageBase extends ArchPackageBase {
   public constructor(init: PackageInit, arch: Arch) {
     const pkgbase = typeof init === "string" ? init : init.p;
     super(pkgbase, arch);
+    if (typeof init === "object") {
+      this.extraDeps = init.extraDeps;
+      this.ignorePkgs = init.ignorePkgs;
+    }
   }
 
   get aurGitUrl() {

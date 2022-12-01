@@ -15,6 +15,9 @@ export default class ArchPackageBase {
     this.log = log4js.getLogger(`Package.${pkgbase}-${arch}`);
   }
 
+  public extraDeps = "";
+  public ignorePkgs = "";
+
   get path() {
     return path.join(config.paths.sources[this.arch], this.pkgbase);
   }
@@ -59,7 +62,7 @@ export default class ArchPackageBase {
       .split("\n")
       .filter((it) => it)
       .map((line) => path.basename(line))
-      .map((line) => line.substring(0, line.indexOf(".pkg.tar")))
+      .map((line) => line.substring(0, line.indexOf(".pkg.tar")));
   }
 
   /**
@@ -115,6 +118,7 @@ export default class ArchPackageBase {
       },
       rm: true,
       command: ["sudo", "-u", "builder", "/scripts/build.sh"],
+      env: {},
     };
 
     switch (builderConfig.type) {

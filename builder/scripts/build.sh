@@ -13,6 +13,9 @@ sudo chmod 777 /work
 
 source PKGBUILD
 for pkg in ${EXTRA_DEPENDS[@]} ${makedepends[@]} ${depends[@]} ;do
+  if [[ "${IGNORE_PACKAGES[@]}" =~ $pkg ]]; then
+    continue
+  fi
   yay -S --noconfirm --nouseask --needed --asdeps --overwrite='*' $pkg
 done
 
