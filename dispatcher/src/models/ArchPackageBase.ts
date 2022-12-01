@@ -42,7 +42,7 @@ export default class ArchPackageBase {
    * 当前目录被 build 之后能得到的包文件
    */
   private get filesToGet() {
-    const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist"], {
+    const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist --skipinteg"], {
       cwd: this.path,
       encoding: "utf-8",
       env: {
