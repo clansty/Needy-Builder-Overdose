@@ -1,5 +1,6 @@
 import path from "path";
 import config from "../models/config";
+import log4js from "log4js";
 
 export default {
   appenders: {
@@ -15,6 +16,7 @@ export default {
       base: path.join(config.paths.logs, "build") + "/",
       property: "categoryName",
       extension: ".log",
+      layout: { type: "messagePassThrough" },
     },
     package: {
       type: "multiFile",
@@ -32,8 +34,8 @@ export default {
   },
   categories: {
     default: { appenders: ["dispatcher", "console"], level: "trace" },
-    Build: { appenders: ["build", "console"], level: "trace" },
-    Package: { appenders: ["package", "console"], level: "trace" },
+    Build: { appenders: ["build"], level: "trace" },
+    Package: { appenders: ["package", "console"], level: "debug" },
     Repo: { appenders: ["repo", "console"], level: "trace" },
   },
-};
+} as log4js.Configuration;

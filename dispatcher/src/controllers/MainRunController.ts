@@ -1,6 +1,6 @@
 import log4js, { getLogger } from "log4js";
 import config, { reloadConfig } from "../models/config";
-import { ChildProcessWithoutNullStreams } from "child_process";
+import { ChildProcessWithoutNullStreams, spawnSync } from "child_process";
 import docker from "../utils/docker";
 import { ArchConfig, ArchRepoInfoEntry } from "../types/ConfigTypes";
 import wrapChildProcess from "../utils/wrapChildProcess";
@@ -28,9 +28,9 @@ export default class MainRunController {
   private status: BuildStatus;
   private repos = new PackageList((arch) => new ArchRepo(arch));
 
-  private recordError(message: string) {
-    this.status.errors.push(message);
-    this.log.error(message);
+  private recordError(...message: string[]) {
+    this.status.errors.push(message.join(" "));
+    this.log.error(message.shift(), ...message);
   }
 
   private updateDockerImages() {
@@ -134,7 +134,13 @@ export default class MainRunController {
               );
               pkg.success = true;
             } catch (error) {
-              this.recordError(`${pkg.pkg.pkgbase}-${arch}: Build failed`);
+              const logPath = path.join(
+                config.paths.logs,
+                "build",
+                `Build.${pkg.pkg.pkgbase}-${arch}.${date("yyyy-MM-dd.hhmmss", pkg.buildDate)}.log`
+              );
+              this.recordError(`${pkg.pkg.pkgbase}-${arch}: Build failed, log file:`, logPath);
+              spawnSync("tail", [logPath], { stdio: "inherit" });
               continue;
             }
             try {

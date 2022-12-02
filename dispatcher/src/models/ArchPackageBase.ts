@@ -60,7 +60,8 @@ export default class ArchPackageBase {
           CARCH: this.arch,
         },
       });
-      this.log.trace("Update pkgver:", res.status, res.stdout, res.stderr);
+      const logFunc = res.status ? this.log.error : this.log.trace;
+      logFunc("Update pkgver:", res.status, res.stdout, res.stderr);
     }
     const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist --skipinteg"], {
       cwd: this.path,
