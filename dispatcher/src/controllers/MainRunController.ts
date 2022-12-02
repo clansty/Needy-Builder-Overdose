@@ -1,5 +1,5 @@
 import log4js, { getLogger } from "log4js";
-import config from "../models/config";
+import config, { reloadConfig } from "../models/config";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import docker from "../utils/docker";
 import { ArchConfig, ArchRepoInfoEntry } from "../types/ConfigTypes";
@@ -203,6 +203,7 @@ export default class MainRunController {
       throw new Error("Running");
     }
     this.isRunning = true;
+    reloadConfig();
     this.status = new BuildStatus();
     await this.updateDockerImages();
     await this.updateSources();

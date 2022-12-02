@@ -5,7 +5,7 @@ import { ArchConfig, Builder, PackageInit } from "../types/ConfigTypes";
 
 const CONFIG_PATH = process.env.CONFIG;
 
-export default YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
+const config = YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
   builders: { [key in Arch]: Builder };
   paths: {
     sources: { [key in Arch]: string };
@@ -17,3 +17,9 @@ export default YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
   arches: { [key in Arch]: ArchConfig };
   repoName: string;
 };
+
+export const reloadConfig = () => {
+  Object.assign(config, YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")));
+};
+
+export default config;
