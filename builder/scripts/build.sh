@@ -9,6 +9,7 @@ COMPRESSZST=(zstd -19 -c -z -q --threads=0 -)
 MAKEFLAGS="-j$(nproc)"
 BUILDDIR=/tmp/makepkg' > ~/.makepkg.conf
 
+sudo chown -R $USER /work
 sudo chmod 777 /work
 
 source PKGBUILD

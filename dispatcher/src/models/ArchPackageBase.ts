@@ -48,6 +48,20 @@ export default class ArchPackageBase {
    * 当前目录被 build 之后能得到的包文件
    */
   private get filesToGet() {
+    const pkgbuild = fs.readFileSync(path.join(this.path, "PKGBUILD"), "utf-8");
+    if (pkgbuild.includes("pkgver()")) {
+      this.log.trace("-git");
+      // 应该是个 -git 包
+      // makepkg -sfAod，有权限问题
+      const res = spawnSync("bash", ["-c", "sudo chown -R dispatcher . ; makepkg -sfAod"], {
+        cwd: this.path,
+        encoding: "utf-8",
+        env: {
+          CARCH: this.arch,
+        },
+      });
+      this.log.trace("Update pkgver:", res.status, res.stdout, res.stderr);
+    }
     const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist --skipinteg"], {
       cwd: this.path,
       encoding: "utf-8",
@@ -96,12 +110,6 @@ export default class ArchPackageBase {
    * 根据数据库对比是否需要重新构建
    */
   get rebuildNeeded() {
-    const pkgbuild = fs.readFileSync(path.join(this.path, "PKGBUILD"), "utf-8");
-    if (pkgbuild.includes("pkgver()")) {
-      this.log.trace("-git");
-      // 应该是个 -git 包
-      return true;
-    }
     this.log.trace("this.filesWeHaveBasenamesWithoutExts", this.filesWeHaveBasenamesWithoutExts);
     this.log.trace("this.filesToGet", this.filesToGet);
     return this.filesToGet.some((file) => !this.filesWeHaveBasenamesWithoutExts.includes(file));

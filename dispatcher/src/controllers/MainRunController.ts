@@ -201,5 +201,6 @@ export default class MainRunController {
     await this.status.saveStatus();
     await this.generateRepoInfo();
     this.isRunning = false;
+    this.log.info`Build finished`;
   }
 }
