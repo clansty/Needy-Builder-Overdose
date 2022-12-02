@@ -129,8 +129,11 @@ export default class ArchPackageBase {
         "/scripts": `${config.paths.program}/builder/scripts`,
       },
       rm: true,
-      command: ["sudo", "-Eu", "builder", "/scripts/build.sh"],
-      env: {},
+      command: ["sudo", "-EHu", "builder", "/scripts/build.sh"],
+      env: {
+        EXTRA_DEPENDS: this.extraDeps,
+        IGNORE_PACKAGES: this.ignorePkgs,
+      },
     };
 
     switch (builderConfig.type) {
