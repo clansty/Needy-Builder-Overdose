@@ -60,8 +60,8 @@ export default class ArchPackageBase {
           CARCH: this.arch,
         },
       });
-      const logFunc = res.status ? this.log.error : this.log.trace;
-      logFunc("Update pkgver:", res.status, res.stdout, res.stderr);
+      const level = res.status ? "error" : "trace";
+      this.log[level]("Update pkgver:", res.status, res.stdout, res.stderr);
     }
     const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist --skipinteg"], {
       cwd: this.path,
@@ -129,7 +129,7 @@ export default class ArchPackageBase {
         "/scripts": `${config.paths.program}/builder/scripts`,
       },
       rm: true,
-      command: ["sudo", "-u", "builder", "/scripts/build.sh"],
+      command: ["sudo", "-Eu", "builder", "/scripts/build.sh"],
       env: {},
     };
 
