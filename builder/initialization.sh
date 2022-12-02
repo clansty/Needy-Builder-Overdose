@@ -1,7 +1,6 @@
 #!/bin/bash
 
 if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
-    pacman-key --init
     # Patch Manjaro's mirrorlist to avoid HTTP 429
     if cat /etc/pacman.conf | grep manjaro > /dev/null; then
         if [[ "$(uname -m)" == "aarch64" ]]; then
@@ -9,25 +8,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         else
             echo 'Server = http://mirrors.gigenet.com/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
         fi
-    elif [[ "$(uname -m)" != "riscv64" ]]; then
-    echo '
-[Clansty]
-SigLevel = Never
-Server = https://repo.lwqwq.com/archlinux/$arch
-Server = https://pacman.ltd/archlinux/$arch
-Server = https://repo.clansty.com/archlinux/$arch
-
-[menci]
-SigLevel = Never
-Server = https://aur.men.ci/archlinux/$arch
-
-[archlinuxcn]
-Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux-cn/$arch
-    ' >> /etc/pacman.conf
-    pacman -Sy archlinuxcn-keyring --noconfirm --needed
-
     fi
-
     pacman -Syu base-devel --noconfirm --needed
 elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -85,11 +66,29 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         # Install from AUR
         mkdir /tmp/build-yay
         cd /tmp/build-yay
-        curl https://aur.archlinux.org/cgit/aur.git/snapshot/yay-bin.tar.gz | tar xzvf -
-        cd yay-bin
+        curl https://aur.archlinux.org/cgit/aur.git/snapshot/yay.tar.gz | tar xzvf -
+        cd yay
         chown -R "$BUILD_USER:$BUILD_USER" .
-        sudo -EHu "$BUILD_USER" makepkg -sif --needed --noconfirm
+        sudo -EHu "$BUILD_USER" makepkg -sifA --needed --noconfirm
         rm -rf /tmp/build-yay
+    fi
+
+    if [[ "$(uname -m)" != "riscv64" ]]; then
+        echo '
+[Clansty]
+SigLevel = Never
+Server = https://repo.lwqwq.com/archlinux/$arch
+Server = https://pacman.ltd/archlinux/$arch
+Server = https://repo.clansty.com/archlinux/$arch
+
+[menci]
+SigLevel = Never
+Server = https://aur.men.ci/archlinux/$arch
+
+[archlinuxcn]
+SigLevel = Never
+Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux-cn/$arch
+        ' >> /etc/pacman.conf
     fi
 elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
     # una
