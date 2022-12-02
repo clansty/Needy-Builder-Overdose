@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
+    pacman-key --init
     # Patch Manjaro's mirrorlist to avoid HTTP 429
     if cat /etc/pacman.conf | grep manjaro > /dev/null; then
         if [[ "$(uname -m)" == "aarch64" ]]; then
@@ -8,7 +9,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         else
             echo 'Server = http://mirrors.gigenet.com/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
         fi
-    else
+    elif [[ "$(uname -m)" != "riscv64" ]]; then
     echo '
 [Clansty]
 SigLevel = Never
@@ -23,6 +24,8 @@ Server = https://aur.men.ci/archlinux/$arch
 [archlinuxcn]
 Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux-cn/$arch
     ' >> /etc/pacman.conf
+    pacman -Sy archlinuxcn-keyring --noconfirm --needed
+
     fi
 
     pacman -Syu base-devel --noconfirm --needed

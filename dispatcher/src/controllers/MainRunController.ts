@@ -102,7 +102,7 @@ export default class MainRunController {
           }
         })()
       );
-      await sleep(500);
+      await sleep(300);
     }
 
     await Promise.all(promises);
