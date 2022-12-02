@@ -4,6 +4,11 @@ set -x
 cd /work
 yay -Syu --noconfirm --nouseask
 
+echo '************'
+echo EXTRA_DEPENDS ${EXTRA_DEPENDS[@]}
+echo IGNORE_PACKAGES ${IGNORE_PACKAGES[@]}
+echo '************'
+
 echo 'PACKAGER="Clansty <i@gao4.pw>"
 COMPRESSZST=(zstd -19 -c -z -q --threads=0 -)
 MAKEFLAGS="-j$(nproc)"

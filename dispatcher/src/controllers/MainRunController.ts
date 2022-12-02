@@ -114,11 +114,14 @@ export default class MainRunController {
       const archPakcages = this.status.allPackages[arch] as AurPackageBase[];
       this.status.updatedPackages[arch].push(
         ...archPakcages
-          .filter((pkg) => pkg.rebuildNeeded)
-          .map((pkg) => {
-            this.log.info("Rebuild needed:", pkg.pkgbase);
-            return new UpdatedPackage(pkg);
+          .filter((pkg) => {
+            const rebuildNeeded = pkg.rebuildNeeded;
+            if (rebuildNeeded) {
+              this.log.info("Rebuild needed:", arch, pkg.pkgbase);
+            }
+            return rebuildNeeded;
           })
+          .map((pkg) => new UpdatedPackage(pkg))
       );
     }
   }

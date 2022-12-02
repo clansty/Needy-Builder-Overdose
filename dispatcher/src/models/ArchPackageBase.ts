@@ -112,8 +112,9 @@ export default class ArchPackageBase {
    */
   get rebuildNeeded() {
     this.log.trace("this.filesWeHaveBasenamesWithoutExts", this.filesWeHaveBasenamesWithoutExts);
-    this.log.trace("this.filesToGet", this.filesToGet);
-    return this.filesToGet.some((file) => !this.filesWeHaveBasenamesWithoutExts.includes(file));
+    const filesToGet = this.filesToGet;
+    this.log.trace("this.filesToGet", filesToGet);
+    return filesToGet.some((file) => !this.filesWeHaveBasenamesWithoutExts.includes(file));
   }
 
   public build(log = log4js.getLogger(`Build.${this.pkgbase}-${this.arch}.${date("yyyy-MM-dd.hhmmss")}`)) {
@@ -129,11 +130,14 @@ export default class ArchPackageBase {
         "/scripts": `${config.paths.program}/builder/scripts`,
       },
       rm: true,
-      command: ["sudo", "-EHu", "builder", "/scripts/build.sh"],
-      env: {
-        EXTRA_DEPENDS: this.extraDeps,
-        IGNORE_PACKAGES: this.ignorePkgs,
-      },
+      command: [
+        "sudo",
+        "-Hu",
+        "builder",
+        `EXTRA_DEPENDS=${this.extraDeps}`,
+        `IGNORE_PACKAGES=${this.ignorePkgs}`,
+        "/scripts/build.sh",
+      ],
     };
 
     switch (builderConfig.type) {
