@@ -53,7 +53,7 @@ export default class ArchPackageBase {
       this.log.trace("-git");
       // 应该是个 -git 包
       // makepkg -sfAod，有权限问题
-      const res = spawnSync("bash", ["-c", "sudo chown -R dispatcher . ; makepkg -sfAod --skipinteg"], {
+      const res = spawnSync("bash", ["-c", "makepkg -sfAod --skipinteg"], {
         cwd: this.path,
         encoding: "utf-8",
         env: {
