@@ -19,6 +19,7 @@ import decompress from "decompress";
 import decompressTarxz from "decompress-tarxz";
 import parseArchDbPackageInfo from "../utils/parseArchDbPackageInfo";
 import checkAndLinkFile from "../utils/checkAndLinkFile";
+import sleep from "sleep-promise";
 
 export default class MainRunController {
   private log = log4js.getLogger("Dispatcher");
@@ -32,69 +33,79 @@ export default class MainRunController {
     this.log.error(message);
   }
 
-  private async updateDockerImages() {
-    for (const [arch, builder] of Object.entries(config.builders)) {
-      this.log.info("Update docker image for", arch, "builder...");
-      try {
-        const archCfg: ArchConfig = config.arches[arch];
-        let command: ChildProcessWithoutNullStreams;
-        switch (builder.type) {
-          case "local":
-            command = docker.pull({ ...archCfg, ...builder });
-            break;
-          case "ssh-docker":
-            command = docker.pullOverSsh({ ...archCfg, ...builder });
-            break;
-          default:
-            this.log.info("No need for type", builder.type);
-            break;
+  private updateDockerImages() {
+    return Promise.all(
+      Object.entries(config.builders).map(async ([arch, builder]) => {
+        this.log.info("Update docker image for", arch, "builder...");
+        try {
+          const archCfg: ArchConfig = config.arches[arch];
+          let command: ChildProcessWithoutNullStreams;
+          switch (builder.type) {
+            case "local":
+              command = docker.pull({ ...archCfg, ...builder });
+              break;
+            case "ssh-docker":
+              command = docker.pullOverSsh({ ...archCfg, ...builder });
+              break;
+            default:
+              this.log.info("No need for type", builder.type);
+              break;
+          }
+          await wrapChildProcess(command, log4js.getLogger(`UpdateDocker.${arch}`));
+          this.log.info("Update docker image for", arch, "builder done");
+        } catch (error) {
+          this.recordError(`Unable to update docker image for ${arch} builder`);
         }
-        await wrapChildProcess(command, log4js.getLogger(`UpdateDocker.${arch}`));
-        this.log.info("Update docker image for", arch, "builder done");
-      } catch (error) {
-        this.recordError(`Unable to update docker image for ${arch} builder`);
-      }
-    }
+      })
+    );
   }
 
   private async updateSources() {
     this.log.info("Fetch sources...");
+    const promises: Promise<void>[] = [];
 
     for (const pkgInit of config.pacman) {
-      const pkg = new AurPackageBase(pkgInit, "x86_64");
-      this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
-      try {
-        await pkg.updateSource();
-        this.status.allPackages.x86_64.push(pkg);
-      } catch (error) {
-        this.log.error(pkg.pkgbase, error);
-        this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
-        continue;
-      }
-      let arches = pkg.archesSupported;
-      if (arches === "any") {
-        arches = Object.keys(config.arches) as Arch[];
-      }
-      if (typeof pkgInit === "object") {
-        for (const archSupported of Object.keys(config.arches) as Arch[]) {
-          if (pkgInit[archSupported] && !arches.includes(archSupported)) {
-            arches.push(archSupported);
+      promises.push(
+        (async () => {
+          const pkg = new AurPackageBase(pkgInit, "x86_64");
+          this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
+          try {
+            await pkg.updateSource();
+            this.status.allPackages.x86_64.push(pkg);
+          } catch (error) {
+            this.log.error(pkg.pkgbase, error);
+            this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
+            return;
           }
-        }
-      }
-      for (const arch of arches.filter((it) => it !== "x86_64" && config.arches[it])) {
-        const pkg = new AurPackageBase(pkgInit, arch);
-        this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
-        try {
-          await pkg.updateSource();
-          this.status.allPackages[arch].push(pkg);
-        } catch (error) {
-          this.log.error(pkg.pkgbase, error);
-          this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
-          continue;
-        }
-      }
+          let arches = pkg.archesSupported;
+          if (arches === "any") {
+            arches = Object.keys(config.arches) as Arch[];
+          }
+          if (typeof pkgInit === "object") {
+            for (const archSupported of Object.keys(config.arches) as Arch[]) {
+              if (pkgInit[archSupported] && !arches.includes(archSupported)) {
+                arches.push(archSupported);
+              }
+            }
+          }
+          for (const arch of arches.filter((it) => it !== "x86_64" && config.arches[it])) {
+            const pkg = new AurPackageBase(pkgInit, arch);
+            this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
+            try {
+              await pkg.updateSource();
+              this.status.allPackages[arch].push(pkg);
+            } catch (error) {
+              this.log.error(pkg.pkgbase, error);
+              this.recordError(`${pkg.pkgbase}-${pkg.arch}: Unable to update source`);
+              continue;
+            }
+          }
+        })()
+      );
+      await sleep(500);
     }
+
+    await Promise.all(promises);
   }
 
   private calculateUpdatedPackages() {
