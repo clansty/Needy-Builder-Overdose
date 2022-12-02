@@ -69,7 +69,7 @@ fi
 BUILD_USER="builder"
 BUILD_USER_HOME="/home/$BUILD_USER"
 if ! id "$BUILD_USER" &> /dev/null; then
-    useradd "$BUILD_USER" --home-dir "$BUILD_USER_HOME"
+    useradd "$BUILD_USER" -u 6666 --home-dir "$BUILD_USER_HOME"
     mkdir "$BUILD_USER_HOME"
     chown "$BUILD_USER:$BUILD_USER" "$BUILD_USER_HOME"
 fi
