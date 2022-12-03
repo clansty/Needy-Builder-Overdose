@@ -35,7 +35,7 @@ export default {
   categories: {
     default: { appenders: ["dispatcher", "console"], level: "trace" },
     Build: { appenders: ["build"], level: "trace" },
-    Package: { appenders: ["package", "console"], level: "debug" },
+    Package: { appenders: ["package", "console"], level: "info" },
     Repo: { appenders: ["repo", "console"], level: "trace" },
   },
 } as log4js.Configuration;

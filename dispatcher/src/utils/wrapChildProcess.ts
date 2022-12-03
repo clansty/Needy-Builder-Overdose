@@ -14,7 +14,8 @@ export default (command: ChildProcessWithoutNullStreams, log: Logger) =>
       log.warn(data.toString("utf8").trim());
     });
     command.on("close", (code) => {
-      log.mark("Child process exited:", code);
+      const level = code ? "error" : "trace";
+      log[level]("Child process exited:", code);
       if (code === 0) {
         resolve();
       } else {

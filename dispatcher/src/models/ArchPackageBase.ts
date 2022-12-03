@@ -61,7 +61,8 @@ export default class ArchPackageBase {
         },
       });
       const level = res.status ? "error" : "trace";
-      this.log[level]("Update pkgver:", res.status, res.stdout, res.stderr);
+      this.log[level]("Update pkgver:", res.status);
+      this.log.debug(res.stdout, res.stderr);
     }
     const pkglist = spawnSync("bash", ["-c", "makepkg --packagelist --skipinteg"], {
       cwd: this.path,
