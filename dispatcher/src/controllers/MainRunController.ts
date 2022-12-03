@@ -83,12 +83,15 @@ export default class MainRunController {
           }
           if (typeof pkgInit === "object") {
             for (const archSupported of Object.keys(config.arches) as Arch[]) {
+              // 加入配置文件中注明但是包里没注明的架构
               if (pkgInit[archSupported] && !arches.includes(archSupported)) {
                 arches.push(archSupported);
               }
             }
           }
+          // 包里注明且支持的架构
           for (const arch of arches.filter((it) => it !== "x86_64" && config.arches[it])) {
+            if (typeof pkgInit === "object" && pkgInit[arch] === false) continue;
             const pkg = new AurPackageBase(pkgInit, arch);
             this.log.info("Fetching:", pkg.pkgbase, pkg.arch);
             try {
