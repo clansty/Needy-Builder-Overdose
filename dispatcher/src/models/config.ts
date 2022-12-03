@@ -12,6 +12,7 @@ const config = YAML.parse(fs.readFileSync(CONFIG_PATH, "utf-8")) as {
     logs: string;
     program: string;
     repo: string;
+    localMirrors: string;
   };
   pacman: Array<PackageInit>;
   arches: { [key in Arch]: ArchConfig };

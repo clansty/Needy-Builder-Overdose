@@ -129,6 +129,7 @@ export default class ArchPackageBase {
       volumes: {
         "/work": this.path,
         "/scripts": `${config.paths.program}/builder/scripts`,
+        "/mirrors": `${config.paths.localMirrors}`,
       },
       rm: true,
       command: [

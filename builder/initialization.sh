@@ -73,22 +73,28 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         rm -rf /tmp/build-yay
     fi
 
+    # Add repos
     if [[ "$(uname -m)" != "riscv64" ]]; then
         echo '
 [Clansty]
 SigLevel = Never
-Server = https://repo.lwqwq.com/archlinux/$arch
-Server = https://pacman.ltd/archlinux/$arch
-Server = https://repo.clansty.com/archlinux/$arch
-
-[menci]
-SigLevel = Never
-Server = https://aur.men.ci/archlinux/$arch
-
-[archlinuxcn]
-SigLevel = Never
-Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux-cn/$arch
+Server = file:///mirrors/clansty/archlinux/$arch
         ' >> /etc/pacman.conf
+    fi
+
+    # Change repo address
+    if cat /etc/os-release | grep archlinux > /dev/null; then
+        case "$(uname -m)" in
+        x86_64)
+            echo 'Server = file:///mirrors/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+            ;;
+        aarch64)
+            echo 'Server = file:///mirrors/archlinuxarm/$arch/$repo' > /etc/pacman.d/mirrorlist
+            ;;
+        riscv64)
+            echo 'Server = file:///mirrors/archriscv/$repo' > /etc/pacman.d/mirrorlist
+            ;;
+        esac
     fi
 elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
     # una
