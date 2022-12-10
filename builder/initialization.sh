@@ -92,7 +92,7 @@ Server = file:///mirrors/clansty/archlinux/$arch
             echo 'Server = file:///mirrors/archlinuxarm/$arch/$repo' > /etc/pacman.d/mirrorlist
             ;;
         riscv64)
-            echo 'Server = file:///mirrors/archriscv/$repo' > /etc/pacman.d/mirrorlist
+            echo 'Server = file:///mirrors/archriscv/repo/$repo' > /etc/pacman.d/mirrorlist
             ;;
         esac
     fi
