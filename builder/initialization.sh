@@ -74,7 +74,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
     fi
 
     # Add repos
-    if [[ "$(uname -m)" != "riscv64" ]]; then
+    if [[ "$(uname -m)" != "loong64" ]]; then
         echo '
 [Clansty]
 SigLevel = Never
