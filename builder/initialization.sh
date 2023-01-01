@@ -73,15 +73,6 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         rm -rf /tmp/build-yay
     fi
 
-    # Add repos
-    if [[ "$(uname -m)" != "loong64" ]]; then
-        echo '
-[Clansty]
-SigLevel = Never
-Server = file:///mirrors/clansty/archlinux/$arch
-        ' >> /etc/pacman.conf
-    fi
-
     # Change repo address
     if cat /etc/os-release | grep archlinux > /dev/null; then
         case "$(uname -m)" in
@@ -93,6 +84,9 @@ Server = file:///mirrors/clansty/archlinux/$arch
             ;;
         riscv64)
             echo 'Server = file:///mirrors/archriscv/repo/$repo' > /etc/pacman.d/mirrorlist
+            ;;
+        loong64)
+            echo 'Server = file:///mirrors/loongarchlinux/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
             ;;
         esac
     fi
