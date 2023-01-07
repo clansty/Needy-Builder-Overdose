@@ -1,6 +1,9 @@
 #!/bin/bash
+set -x
 
 if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
+    pacman-key --init
+    pacman-key --populate
     # Patch Manjaro's mirrorlist to avoid HTTP 429
     if cat /etc/pacman.conf | grep manjaro > /dev/null; then
         if [[ "$(uname -m)" == "aarch64" ]]; then

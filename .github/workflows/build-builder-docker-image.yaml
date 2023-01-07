@@ -2,6 +2,7 @@ name: Build Builder Docker Image
 
 on:
   workflow_dispatch:
+  push:
   schedule:
     - cron: '30 7 * * *'
 
