@@ -23,16 +23,22 @@ export default class AurPackageBase extends ArchPackageBase {
     return `https://aur.archlinux.org/packages/${this.pkgbase}`;
   }
 
-  public updateSource() {
+  public async updateSource() {
     const dirExists = fs.existsSync(this.path);
     let command: ChildProcessWithoutNullStreams;
     if (dirExists) {
+      await wrapChildProcess(
+        spawn("git", ["reset", "--hard"], {
+          cwd: this.path,
+        }),
+        this.log
+      );
       command = spawn("git", ["pull"], {
         cwd: this.path,
       });
     } else {
       command = spawn("git", ["clone", this.aurGitUrl, this.path]);
     }
-    return wrapChildProcess(command, this.log);
+    return await wrapChildProcess(command, this.log);
   }
 }

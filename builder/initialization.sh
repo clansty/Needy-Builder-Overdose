@@ -9,7 +9,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
             echo 'Server = http://mirrors.gigenet.com/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
         fi
     fi
-    pacman -Syu base-devel --noconfirm --needed
+    pacman -Syu base-devel --noconfirm --needed || exit 1
 elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
@@ -18,9 +18,9 @@ elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
         wget
         apt-transport-https
     )
-    apt-get update
-    apt-get dist-upgrade -y
-    apt-get install -y "${INITIALIZE_DEPENDENCIES[@]}"
+    apt-get update || exit 1
+    apt-get dist-upgrade -y || exit 1
+    apt-get install -y "${INITIALIZE_DEPENDENCIES[@]}" || exit 1
 
     # Add makedeb repo
     wget -qO - 'https://proget.makedeb.org/debian-feeds/makedeb.pub' | gpg --dearmor | tee /usr/share/keyrings/makedeb-archive-keyring.gpg 1> /dev/null
@@ -34,7 +34,7 @@ elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
         devscripts
         equivs
     )
-    apt-get update && apt-get install -y "${BUILD_DEPENDENCIES[@]}"
+    apt-get update && apt-get install -y "${BUILD_DEPENDENCIES[@]}" || exit 1
 
     # Inject arguments to makedeb with a wrapper
     MAKEDEB_WRAPPER="/usr/local/bin/makedeb"
@@ -50,9 +50,9 @@ fi
 BUILD_USER="builder"
 BUILD_USER_HOME="/home/$BUILD_USER"
 if ! id "$BUILD_USER" &> /dev/null; then
-    useradd "$BUILD_USER" -u 6666 --home-dir "$BUILD_USER_HOME"
-    mkdir "$BUILD_USER_HOME"
-    chown "$BUILD_USER:$BUILD_USER" "$BUILD_USER_HOME"
+    useradd "$BUILD_USER" -u 6666 --home-dir "$BUILD_USER_HOME" || exit 1
+    mkdir "$BUILD_USER_HOME" || exit 1
+    chown "$BUILD_USER:$BUILD_USER" "$BUILD_USER_HOME" || exit 1
 fi
 echo "$BUILD_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
@@ -61,7 +61,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
     # yay
     if pacman -Ss ^yay$ &> /dev/null; then
         # Install from rpeo
-        sudo pacman -S yay --needed --noconfirm
+        sudo pacman -S yay --needed --noconfirm || exit 1
     else
         # Install from AUR
         mkdir /tmp/build-yay
@@ -69,7 +69,7 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
         curl https://aur.archlinux.org/cgit/aur.git/snapshot/yay.tar.gz | tar xzvf -
         cd yay
         chown -R "$BUILD_USER:$BUILD_USER" .
-        sudo -EHu "$BUILD_USER" makepkg -sifA --needed --noconfirm
+        sudo -EHu "$BUILD_USER" makepkg -sifA --needed --noconfirm || exit 1
         rm -rf /tmp/build-yay
     fi
 
@@ -92,11 +92,11 @@ if [[ "$PACKAGE_TYPE" == "pacman" ]]; then
     fi
 elif [[ "$PACKAGE_TYPE" == "deb" ]]; then
     # una
-    git clone https://mpr.makedeb.org/una-bin /tmp/una-bin
+    git clone https://mpr.makedeb.org/una-bin /tmp/una-bin || exit 1
     cd /tmp/una-bin
     mkdir /etc/una # AFK-OS/una#24
     chown -R "$BUILD_USER:$BUILD_USER" .
-    sudo -u "$BUILD_USER" makedeb -si
+    sudo -u "$BUILD_USER" makedeb -si || exit 1
     rm -rf /tmp/una-bin
 fi
 
